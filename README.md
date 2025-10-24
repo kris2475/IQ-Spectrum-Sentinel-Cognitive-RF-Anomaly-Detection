@@ -2,9 +2,13 @@
 
 ## 🛡️ Project Overview
 
-**Spectrum Sentinel** is a next-generation Electronic Warfare (EW) and Signals Intelligence (SIGINT) framework leveraging **Software-Defined Radio (SDR)** and **Unsupervised Deep Learning** to achieve real-time, autonomous spectrum awareness.
+**Spectrum Sentinel** is a **hobby project** that mixes **Software-Defined Radio (SDR)** with **Unsupervised Deep Learning** to experiment with real-time, autonomous spectrum awareness. The idea isn’t new, but it’s interesting — and worth exploring for myself.
 
-The core mission is to rapidly detect and classify **"zero-day" or novel threat emitters**—such as adaptive jammers, clandestine communication links, and dynamic protocols—that would bypass traditional, library-dependent EW systems. By using unsupervised techniques like Autoencoders and Clustering, the system can automatically build a comprehensive intelligence picture of an unknown electromagnetic environment.
+I’m using a **Nooelec NESDR Smart** as my SDR. It’s a simple, affordable device — not the most capable option compared to higher-end gear like USRPs or BladeRFs — but it’s perfect for learning. This project is really about understanding the **principles behind Electronic Warfare (EW)**, not building a professional system.
+
+The idea is simple: use an SDR to capture wideband RF data, turn it into spectrograms, and then train an **autoencoder** to spot signals that don’t look like the “normal” background. These anomalies might represent **unknown transmitters**, **weird interference**, or just something new happening in the airwaves.
+
+I’m not trying to reinvent Electronic Warfare or build a deployable SIGINT tool — this is more like a **playground for experimenting** with cognitive radio concepts and seeing how well deep learning can make sense of noisy, real-world spectrum data.
 
 ---
 
@@ -25,7 +29,7 @@ The architecture follows a three-layer pipeline: Acquisition, Feature Engineerin
 
 | Component | Technology | Function |
 | :--- | :--- | :--- |
-| **RF Front-End** | Commercial Off-The-Shelf (COTS) SDR (e.g., USRP, BladeRF) | Wideband, high-speed capture of raw In-phase and Quadrature (I/Q) time-series data. |
+| **RF Front-End** | Nooelec NESDR Smart (COTS SDR) | Wideband, high-speed capture of raw In-phase and Quadrature (I/Q) time-series data. |
 | **Digitization** | High-speed ADC | Converts analog RF to digital I/Q streams for processing. |
 
 ### 2. Feature Engineering Layer (Pre-Processing)
@@ -58,7 +62,7 @@ The architecture follows a three-layer pipeline: Acquisition, Feature Engineerin
 ### Prerequisites
 
 * Python 3.8+
-* SDR Hardware (with drivers installed)
+* SDR Hardware (e.g., Nooelec NESDR Smart or similar)
 * GPU recommended for rapid deep learning inference.
 
 ### Environment Setup
@@ -120,3 +124,8 @@ python run_sentinel.py --model_path models/cae_final.h5 --threshold 0.5
 | 10:45:05 | 0.95 | 902.1 | 0.9 | HIGH ANOMALY | NEW (A) |
 
 ---
+
+## 🤝 Contribution
+
+This is a fun side project — if you’re also into SDRs, RF, or deep learning, feel free to fork it, tweak it, or share ideas.  
+PRs, bug reports, and interesting experiments are always welcome!
