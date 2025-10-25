@@ -26,8 +26,8 @@ Training deep learning models (**2D CNNs**) on spectrogram matrices is far more 
 
 ### 🎨 Optimised Feature Extraction
 The **Short-Time Fourier Transform (STFT)** generates spectrograms that:
-- Reduce noise
-- Standardise input dimensions
+- Reduce noise  
+- Standardise input dimensions  
 - Highlight key features (frequency, time, and power)
 
 ### ⚖️ Unbiased Training Data
@@ -94,12 +94,76 @@ The system is composed of **three layers**:
 
 ---
 
+## 🧩 Technical Deep Dive: Conv2D Autoencoder Workflow
+
+### 🧱 1. Data Loading and Preparation
+- **Google Drive Mounting:** Accessed compressed spectrogram datasets directly from Drive (`/content/drive/My Drive/ZIP/`).  
+- **Training vs. Testing Data:**  
+  - Training: All `.zip` files except `spectrograms_anomolous.zip`  
+  - Testing: `spectrograms_anomolous.zip` (anomalous samples)  
+- **Extraction Directories:**  
+  - `/tmp/extracted_training_data`  
+  - `/tmp/extracted_testing_data`  
+  Cleaned and recreated to ensure no data overlap.  
+- **Verification:** Confirmed that all `.npy` spectrograms were correctly extracted and separated.
+
+---
+
+### ⚙️ 2. Data Handling for Training
+To prevent memory overflow, a **custom data generator** (`SpectrogramDataGenerator`) was implemented:
+- **On-the-fly loading:** Streams `.npy` spectrograms in mini-batches instead of loading all at once.  
+- **Shape Consistency:** Automatically infers input dimensions (e.g. `(1024, 292, 1)`) from the dataset.  
+- **Memory Efficiency:** Reduced RAM usage drastically — stable even with thousands of spectrograms.  
+- **Generators:** Created for both training and testing datasets, with shuffling enabled for training.
+
+---
+
+### 🧠 3. Autoencoder Model Definition (Conv2D)
+- **Architecture:** A **2D Convolutional Autoencoder** designed for spectrogram data.  
+- **Encoder:** Stacked `Conv2D` and `MaxPooling2D` layers for hierarchical compression.  
+- **Decoder:** Uses `UpSampling2D` and `Cropping2D` to reconstruct input size exactly.  
+- **Loss Function:** Mean Squared Error (MSE)  
+- **Optimizer:** Adam  
+- **Input Shape:** `(1024, 292, 1)` — a single-channel (grayscale) spectrogram image.  
+
+---
+
+### 🧪 4. Model Training
+- **Training Mode:** Utilised the generator to stream batches to the model.  
+- **Validation:** The anomalous dataset was used for validation to monitor reconstruction accuracy on unseen patterns.  
+- **Performance (CPU vs TPU):**  
+  - CPU runtime: ~62 sec/step  
+  - TPU runtime: ~544 ms/step  
+  → **>100× speed improvement** using TPU acceleration.  
+
+---
+
+### 🔍 5. Model Evaluation and Anomaly Detection
+- **Reconstruction Error:** Calculated MSE between input and reconstructed spectrograms.  
+- **Histogram Visualization:** Showed distribution of reconstruction errors to identify natural thresholds.  
+- **Error Metrics:** Computed mean, median, std, max, and min to summarize error spread.  
+- **Anomaly Threshold:** Set as `mean + 2×std`. Samples above threshold were marked as anomalies.  
+- **Anomaly Mapping:** Each anomaly’s index was mapped back to its original `.npy` file for identification.  
+- **Ranking:** Anomalies were ranked by reconstruction error (descending).  
+- **Visualization:** Plotted original vs reconstructed spectrograms to qualitatively assess model behavior.  
+
+---
+
+### 📊 Summary of Findings
+- Successfully trained a **Conv2D Autoencoder** for anomaly detection in spectrogram data.  
+- **Data Generators** enabled large-scale training without RAM overload.  
+- **TPU acceleration** provided a massive runtime improvement.  
+- Detected and ranked **anomalous spectrograms** with traceability to original files.  
+- Future improvements may include **frequency localization** of anomaly sources and **latent space clustering** for deeper insight.  
+
+---
+
 ## 💻 Installation and Setup
 
 ### 🧩 Prerequisites
 - Python **3.8+**
 - SDR hardware (**Nooelec NESDR Smart** or equivalent)
-- **GPU** (recommended for model training)
+- **GPU or TPU** (recommended for model training)
 
 ### 🧱 Environment Setup
 
@@ -174,9 +238,9 @@ See the [LICENSE](LICENSE) file for details.
 
 Pull requests and improvements are welcome!  
 Feel free to open an issue or contribute enhancements to:
-- Data preprocessing
-- Model performance
-- Real-time inference
+- Data preprocessing  
+- Model performance  
+- Real-time inference  
 
 ---
 
