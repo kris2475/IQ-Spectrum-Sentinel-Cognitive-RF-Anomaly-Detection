@@ -185,7 +185,7 @@ Feel free to open an issue or contribute enhancements to:
 - [ ] Real-time dashboard visualisation  
 - [ ] Extended clustering analysis  
 - [ ] Multi-SDR distributed monitoring  
-- [ ] Edge inference optimization  
+- [ ] Edge inference optimisation  
 
 ---
 
